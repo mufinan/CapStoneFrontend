@@ -45,9 +45,7 @@ The application is live and can be accessed at: [Library Management System](http
 
 ### Steps to Run Locally
 1. Clone the repository:
-   ```
-   git clone <repository-url>
-   cd <repository-folder>```
+   ```git clone git https://github.com/mufinan/CapStoneFrontend.git```
 2. Install dependencies:
    ```npm install```
 3. Start the development server:
@@ -64,4 +62,4 @@ The application is live and can be accessed at: [Library Management System](http
 
 ## ✨ Author
 
-This project is maintained by **[Your Name]**.
+This project is maintained by **Mustafa Furkan İnan**.
