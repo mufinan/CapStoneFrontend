@@ -2,6 +2,21 @@
 
 This is the **frontend** for the Library Management System, a React-based web application. It provides a user-friendly interface to manage books, authors, categories, publishers, and borrowing operations.
 
+## 🔑 Important Information
+
+1. **Backend Service**:
+   - **Ensure that the backend service is running and accessible at the correct URL**. 
+   - If backend service is not accesible, please go to https://capstone-mtlt.onrender.com to break inactivity on the service.
+
+2. **Known Limitations**:
+   - The application does not support responsive design; it is optimized for 1200px width.
+   - Borrow operations require at least one valid book to be selected from the database.
+
+3. **Notifications**:
+   - Success and error messages are displayed as notifications (no `window.alert` is used).
+   - If you encounter persistent issues, check the console for error logs.
+
+
 ## 🌐 Live Demo
 
 The application is live and can be accessed at: [Library Management System](https://your-live-site-link.com)
