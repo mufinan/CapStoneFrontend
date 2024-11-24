@@ -16,6 +16,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Notification from '../components/Notification';
+import { useCallback } from 'react';
 
 function CategoryPage() {
   const [categories, setCategories] = useState([]);
@@ -26,24 +27,26 @@ function CategoryPage() {
   const [deleteId, setDeleteId] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchCategories();
-  },[]);
 
   // Bildirim mesajı gösterme
-  const alertNotification = (message, severity) => {
+  const alertNotification = useCallback((message, severity) => {
     setNotification({ open: true, message, severity });
-  };
+  });
 
   // Tüm kategorileri getir
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await api.get('/categories'); // Endpoint: GET /categories
       setCategories(response.data);
     } catch (error) {
       alertNotification('Kategoriler yüklenirken bir hata oluştu.', 'error');
     }
-  };
+  }, [alertNotification]);
+  
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
 
   // Kategori ekleme veya güncelleme
   const handleSubmit = async (event) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -26,23 +26,26 @@ function PublisherPage() {
   const [deleteId, setDeleteId] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchPublishers();
-  },[]);
-
-  const alertNotification = (message, severity) => {
+  // Bildirim mesajı gösterme
+  const alertNotification = useCallback((message, severity) => {
     setNotification({ open: true, message, severity });
-  };
+  }, []);
 
-  const fetchPublishers = async () => {
+  // Tüm yayıncıları getir
+  const fetchPublishers = useCallback(async () => {
     try {
       const response = await api.get('/publishers');
       setPublishers(response.data);
     } catch (error) {
-      alertNotification("Yayıncılar yüklenirken bir hata oluştu.", "error");
+      alertNotification('Yayıncılar yüklenirken bir hata oluştu.', 'error');
     }
-  };
+  }, [alertNotification]);
 
+  useEffect(() => {
+    fetchPublishers();
+  }, [fetchPublishers]);
+
+  // Kategori ekleme veya güncelleme
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -53,8 +56,8 @@ function PublisherPage() {
       formData.address !== selectedPublisher.address
     ) {
       alertNotification(
-        "Güncelleme işleminde sadece yayıncı adı ve kuruluş yılı güncellenebilir.",
-        "error"
+        'Güncelleme işleminde sadece yayıncı adı ve kuruluş yılı güncellenebilir.',
+        'error'
       );
       return;
     }
@@ -62,18 +65,25 @@ function PublisherPage() {
     try {
       if (selectedPublisher) {
         await api.put(`/publishers/${selectedPublisher.id}`, formData);
+        alertNotification('Yayıncı başarıyla güncellendi!', 'success');
       } else {
         await api.post('/publishers', formData);
+        alertNotification('Yayıncı başarıyla eklendi!', 'success');
       }
       fetchPublishers();
-      setSelectedPublisher(null);
-      setFormData({ name: '', establishmentYear: '', address: '' });
-      alertNotification("İşlem başarıyla gerçekleştirildi!", "success");
+      resetForm();
     } catch (error) {
-      alertNotification("İşlem sırasında bir hata oluştu.", "error");
+      alertNotification('İşlem sırasında bir hata oluştu.', 'error');
     }
   };
 
+  // Form sıfırlama
+  const resetForm = () => {
+    setSelectedPublisher(null);
+    setFormData({ name: '', establishmentYear: '', address: '' });
+  };
+
+  // Silme işlemi
   const handleDeleteClick = (id) => {
     setDeleteId(id);
     setDeleteDialogOpen(true);
@@ -83,9 +93,9 @@ function PublisherPage() {
     try {
       await api.delete(`/publishers/${deleteId}`);
       fetchPublishers();
-      alertNotification("Yayıncı başarıyla silindi!", "success");
+      alertNotification('Yayıncı başarıyla silindi!', 'success');
     } catch (error) {
-      alertNotification("Silme işlemi sırasında bir hata oluştu.", "error");
+      alertNotification('Silme işlemi sırasında bir hata oluştu.', 'error');
     }
     setDeleteDialogOpen(false);
   };
@@ -169,11 +179,7 @@ function PublisherPage() {
           <Typography variant="h6" gutterBottom>
             Yayıncı Ekle / Güncelle
           </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{ display: 'grid', gap: 2 }}
-          >
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'grid', gap: 2 }}>
             <TextField
               label="Yayıncı Adı"
               value={formData.name}
@@ -184,9 +190,7 @@ function PublisherPage() {
             <TextField
               label="Kuruluş Yılı"
               value={formData.establishmentYear}
-              onChange={(e) =>
-                setFormData({ ...formData, establishmentYear: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, establishmentYear: e.target.value })}
               fullWidth
               required
             />
@@ -202,14 +206,7 @@ function PublisherPage() {
                 {selectedPublisher ? 'Güncelle' : 'Ekle'}
               </Button>
               {selectedPublisher && (
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={() => {
-                    setSelectedPublisher(null);
-                    setFormData({ name: '', establishmentYear: '', address: '' });
-                  }}
-                >
+                <Button variant="outlined" color="secondary" onClick={resetForm}>
                   İptal
                 </Button>
               )}
@@ -229,10 +226,7 @@ function PublisherPage() {
         message={notification.message}
         severity={notification.severity}
       />
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={cancelDelete}
-      >
+      <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
         <DialogTitle>Yayıncı Sil</DialogTitle>
         <DialogContent>
           <DialogContentText>
