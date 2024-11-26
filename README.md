@@ -19,7 +19,7 @@ This is the **frontend** for the Library Management System, a React-based web ap
 
 ## 🌐 Live Demo
 
-The application is live and can be accessed at: [Library Management System](https://your-live-site-link.com)
+The application is live and can be accessed at: [Library Management System](https://mufinan-library-management-system.netlify.app)
 
 ## 🚀 Features
 
