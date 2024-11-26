@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -42,35 +42,38 @@ function BorrowPage() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchBorrows();
-    fetchBooks();
-  },[]);
-
-  const alertNotification = (message, severity) => {
+  // Bildirim mesajı gösterme
+  const alertNotification = useCallback((message, severity) => {
     setNotification({ open: true, message, severity });
-  };
+  }, []);
 
-  const fetchBorrows = async () => {
+  // Tüm ödünç almaları getir
+  const fetchBorrows = useCallback(async () => {
     try {
-      const response = await api.get('/borrows');
+      const response = await api.get('/borrows'); // Endpoint: GET /borrows
       setBorrows(response.data);
     } catch (error) {
       alertNotification('Ödünç alınan kitaplar yüklenirken bir hata oluştu.', 'error');
     }
-  };
+  }, [alertNotification]);
 
-  const fetchBooks = async () => {
-    try {
-      const response = await api.get('/books');
-      setBooks(response.data);
-      if (response.data.length === 0) {
-        alertNotification('Veritabanında kayıtlı kitap bulunmamaktadır. Lütfen kitap ekleyiniz.', 'warning');
+    // Tüm kitapları getir
+    const fetchBooks = useCallback(async () => {
+      try {
+        const response = await api.get('/books'); // Endpoint: GET /books
+        setBooks(response.data);
+        if (response.data.length === 0) {
+          alertNotification('Veritabanında kayıtlı kitap bulunmamaktadır. Lütfen kitap ekleyiniz.', 'warning');
+        }
+      } catch (error) {
+        alertNotification('Kitaplar yüklenirken bir hata oluştu.', 'error');
       }
-    } catch (error) {
-      alertNotification('Kitaplar yüklenirken bir hata oluştu.', 'error');
-    }
-  };
+    }, [alertNotification]);
+
+    useEffect(() => {
+      fetchBorrows();
+      fetchBooks();
+    },[fetchBorrows,fetchBooks]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();

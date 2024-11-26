@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -26,24 +26,26 @@ function AuthorsPage() {
   const [deleteId, setDeleteId] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchAuthors();
-  },[]);
+  
 
   // Bildirim mesajı gösterme
-  const alertNotification = (message, severity) => {
+  const alertNotification = useCallback((message, severity) => {
     setNotification({ open: true, message, severity });
-  };
+  }, []);
 
   // Tüm yazarları getir
-  const fetchAuthors = async () => {
+  const fetchAuthors = useCallback(async () => {
     try {
       const response = await api.get('/authors'); // Endpoint: GET /authors
       setAuthors(response.data);
     } catch (error) {
       alertNotification('Yazarlar yüklenirken bir hata oluştu.', 'error');
     }
-  };
+  }, [alertNotification]);
+
+  useEffect(() => {
+    fetchAuthors();
+  },[fetchAuthors]);
 
   // Yazar ekleme veya güncelleme
   const handleSubmit = async (event) => {

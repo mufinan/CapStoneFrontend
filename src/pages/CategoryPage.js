@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -16,7 +16,6 @@ import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Notification from '../components/Notification';
-import { useCallback } from 'react';
 
 function CategoryPage() {
   const [categories, setCategories] = useState([]);
@@ -31,7 +30,7 @@ function CategoryPage() {
   // Bildirim mesajı gösterme
   const alertNotification = useCallback((message, severity) => {
     setNotification({ open: true, message, severity });
-  });
+  }, []);
 
   // Tüm kategorileri getir
   const fetchCategories = useCallback(async () => {

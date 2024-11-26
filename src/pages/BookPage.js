@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -48,52 +48,60 @@ function BookPage() {
 
   const navigate = useNavigate();
 
+   // Bildirim mesajı gösterme
+   const alertNotification = useCallback((message, severity) => {
+    setNotification({ open: true, message, severity });
+  }, []);
+
+  // Tüm kitapları getir
+  const fetchBooks = useCallback(async () => {
+    try {
+      const response = await api.get('/books'); // Endpoint: GET /books
+      setBooks(response.data);
+      if (response.data.length === 0) {
+        alertNotification('Veritabanında kayıtlı kitap bulunmamaktadır. Lütfen kitap ekleyiniz.', 'warning');
+      }
+    } catch (error) {
+      alertNotification('Kitaplar yüklenirken bir hata oluştu.', 'error');
+    }
+  }, [alertNotification]);
+
+  // Tüm yayıncıları getir
+  const fetchPublishers = useCallback(async () => {
+    try {
+      const response = await api.get('/publishers');
+      setPublishers(response.data);
+    } catch (error) {
+      alertNotification('Yayıncılar yüklenirken bir hata oluştu.', 'error');
+    }
+  }, [alertNotification]);
+
+  // Tüm kategorileri getir
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await api.get('/categories'); // Endpoint: GET /categories
+      setCategories(response.data);
+    } catch (error) {
+      alertNotification('Kategoriler yüklenirken bir hata oluştu.', 'error');
+    }
+  }, [alertNotification]);
+
+    // Tüm yazarları getir
+    const fetchAuthors = useCallback(async () => {
+      try {
+        const response = await api.get('/authors'); // Endpoint: GET /authors
+        setAuthors(response.data);
+      } catch (error) {
+        alertNotification('Yazarlar yüklenirken bir hata oluştu.', 'error');
+      }
+    }, [alertNotification]);
+
   useEffect(() => {
     fetchBooks();
     fetchPublishers();
     fetchCategories();
     fetchAuthors();
-  },[]);
-
-  const alertNotification = (message, severity) => {
-    setNotification({ open: true, message, severity });
-  };
-
-  const fetchBooks = async () => {
-    try {
-      const response = await api.get('/books');
-      setBooks(response.data);
-    } catch (error) {
-      alertNotification('Kitaplar yüklenirken bir hata oluştu.', 'error');
-    }
-  };
-
-  const fetchPublishers = async () => {
-    try {
-      const response = await api.get('/publishers');
-      setPublishers(response.data);
-    } catch (error) {
-      alertNotification('Yayınevleri yüklenirken bir hata oluştu.', 'error');
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const response = await api.get('/categories');
-      setCategories(response.data);
-    } catch (error) {
-      alertNotification('Kategoriler yüklenirken bir hata oluştu.', 'error');
-    }
-  };
-
-  const fetchAuthors = async () => {
-    try {
-      const response = await api.get('/authors');
-      setAuthors(response.data);
-    } catch (error) {
-      alertNotification('Yazarlar yüklenirken bir hata oluştu.', 'error');
-    }
-  };
+  },[fetchBooks,fetchPublishers,fetchCategories,fetchAuthors]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
